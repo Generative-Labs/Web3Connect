@@ -11,7 +11,7 @@ const (
 	RequestPageSize = 20
 )
 
-func SyncWeb3UserWallets(interval int64) {
+func SyncWeb3UserWallets(interval int64, once bool) {
 	page, err := db.GetUserWalletsPage()
 	if err != nil {
 		log.Fatalf("SyncWeb3UserWallets page get error:%v", err)
@@ -20,6 +20,9 @@ func SyncWeb3UserWallets(interval int64) {
 	for range ticker.C {
 		for ; ; page++ {
 			if !SyncPage(page) {
+				if once {
+					return
+				}
 				break
 			}
 			err = db.UpdateUserWalletPage(page)

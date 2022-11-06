@@ -94,7 +94,7 @@ func TestGetProfileIdByNftContract(t *testing.T) {
 }
 
 func TestGetContractName(t *testing.T) {
-	name, err := GetContractName("0xb1a3dD1b4203b85Ad9947ADBcA111193750cC6E5")
+	name, err := GetContractLensAccount("0xb1a3dD1b4203b85Ad9947ADBcA111193750cC6E5")
 	fmt.Println(name)
 	fmt.Println(err)
 }

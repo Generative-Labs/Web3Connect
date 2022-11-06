@@ -19,16 +19,20 @@ func PushWeb3Ticker(interval int64) {
 func PushFollowEventsToWen3Mq() {
 	events := db.GetPendingFollowEvents()
 	for nftContract, followerAddresses := range events {
-		profileId := db.GetProfileIdByNftContract(nftContract)
-		address := db.GetAddressByProfileId(profileId)
-		userIdExist := db.GetUserIdByWallet(address)
-		if userIdExist == "" {
+		userId := db.GetUserIdByNftContract(nftContract)
+		if userId == "" {
 			continue
 		}
-		userId := db.GetUserIdByNftContract(nftContract)
-		lensAccount := db.GetLensAccountByProfileId(profileId)
-		followers := strings.Join(followerAddresses, ",")
-		followerAccount := db.GetLensAccountByWallet(followers)
+		lensAccount := db.GetLensAccountByNftContract(nftContract)
+		followerAccount := db.GetLensAccountByWallet(followerAddresses[0])
+		if followerAccount == "" {
+			profile, err := GetProfileIdByIndex(followerAddresses[0], 0)
+			followerAccount, err = GetHandleByProfileId(profile)
+			if err != nil {
+				fmt.Println(fmt.Sprintf(">>>>PushFollowEventsToWen3Mq:%v", err))
+				continue
+			}
+		}
 		title := "New Follow Event"
 		// todo notify follower at the sametime
 		NotifyWeb3Mq(db.EventFollow, userId, lensAccount, title, followerAccount)
@@ -50,14 +54,14 @@ func PushPostEventsToWen3Mq() {
 		followers := db.GetFollowersByLensAccount(lensAccount)
 		for _, follower := range followers {
 			userId := db.GetUserIdByWallet(follower)
-			userIdExist := db.GetUserIdByWallet(follower)
-			if userIdExist == "" {
-				continue
-			}
+			//if userId == "" {
+			//	continue
+			//}
 			followerLensAccount := db.GetLensAccountByWallet(follower)
 			add := fmt.Sprintf(`{"notificationUser":"%v",`, followerLensAccount)
 			content = add + content[1:]
 			NotifyWeb3Mq(db.EventPostCreated, userId, lensAccount, "", content)
+			fmt.Println(fmt.Sprintf(">>>>PushFollowEventsToWen3Mq:%v", content))
 		}
 	}
 }

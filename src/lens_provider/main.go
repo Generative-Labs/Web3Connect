@@ -24,9 +24,9 @@ func init() {
 
 func main() {
 	// sync all web3 user wallets first
-	// lens.SyncWeb3UserWallets(viper.GetInt64("sync_web3mq_interval"))
+	lens.SyncWeb3UserWallets(viper.GetInt64("sync_web3mq_interval"), true)
 
-	go lens.SyncWeb3UserWallets(viper.GetInt64("sync_web3mq_interval"))
+	go lens.SyncWeb3UserWallets(viper.GetInt64("sync_web3mq_interval"), false)
 	go lens.SyncBlockTicker(viper.GetInt64("sync_polygon_interval"))
 	go lens.PushWeb3Ticker(viper.GetInt64("push_web3mq_interval"))
 	http.HandleFunc("/lens/owner", lens.LensOwnerAPI)

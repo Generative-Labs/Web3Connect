@@ -20,6 +20,8 @@ const (
 
 	ABIGetProfileIdByHandle = "0x20fa728a" + "0000000000000000000000000000000000000000000000000000000000000020"
 	ABIGetOwnerOfProfileId  = "0x6352211e"
+	ABIDefaultProfile       = "0x92254a62"
+	ABIOwnerOfIndex         = "0x2f745c59"
 	ABIName                 = "0x06fdde03"
 	ABIGetHandle            = "0xec81d194"
 	ABIFollow               = "0xfb78ae6c"

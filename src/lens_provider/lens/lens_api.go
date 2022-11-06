@@ -140,6 +140,31 @@ func JsonRpcPost(url, method string, RPCParams ...string) ([]byte, error) {
 	return body, err
 }
 
+func GetDefaultProfile(address string) (string, error) {
+	HexFill := fmt.Sprintf("%064"+"s", address[2:])
+	transaction := fmt.Sprintf(TxData, ZeroFillAddress, LensContractAddress, ABIDefaultProfile+HexFill)
+	postResult, err := JsonRpcPost(PolygonRpc, "eth_call", transaction, "latest")
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(string(transaction))
+	profile := jsoniter.Get(postResult, "result").ToString()
+	return profile, nil
+}
+
+func GetProfileIdByIndex(address string, index int64) (string, error) {
+	addressFill := fmt.Sprintf("%064"+"s", address[2:])
+	indexFill := fmt.Sprintf("%064"+"s", hexutil.EncodeUint64(uint64(index))[2:])
+	transaction := fmt.Sprintf(TxData, ZeroFillAddress, LensContractAddress, ABIOwnerOfIndex+addressFill+indexFill)
+	postResult, err := JsonRpcPost(PolygonRpc, "eth_call", transaction, "latest")
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(string(transaction))
+	profile := jsoniter.Get(postResult, "result").ToString()
+	return profile, nil
+}
+
 func Get(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {

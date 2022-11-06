@@ -194,15 +194,15 @@ func SetProfileIdToAddress(profileId, address string) error {
 	addressKey := fmt.Sprintf("Address%v:%v", ProfileId, address)
 	redisdb := RedisConfigs[ContractProfile]
 	set := redisdb.Set(profileIdKey, address, 0)
-	set = redisdb.Set(addressKey, address, 0)
+	set = redisdb.Set(addressKey, profileId, 0)
 	return set.Err()
 }
 
 func GetProfileIdByWalletAddress(address string) string {
 	redisdb := RedisConfigs[ContractProfile]
 	addressKey := fmt.Sprintf("Address%v:%v", ProfileId, address)
-	walletAddress := redisdb.Get(addressKey).Val()
-	return walletAddress
+	profileId := redisdb.Get(addressKey).Val()
+	return profileId
 }
 
 func GetAddressByProfileId(profileId string) string {
