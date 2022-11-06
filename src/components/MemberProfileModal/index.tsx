@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ss from "./index.module.scss";
-import { IonButton, IonModal, useIonToast } from "@ionic/react";
+import {IonButton, IonModal, useIonLoading, useIonToast} from "@ionic/react";
 import { useStore } from "src/services/mobx/service";
 import { observer } from "mobx-react-lite";
 import { getShortAddressByAddress } from "../../constant/utils";
-import {PAGE_TYPE, PLATFORM_ENUM} from "../../constant/enum";
+import { PAGE_TYPE, PLATFORM_ENUM } from "../../constant/enum";
 import cx from "classnames";
 import copy from "copy-to-clipboard";
 import ConnectAccountModal, {
@@ -91,6 +91,7 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
   const store = useStore();
   const { loginWeb3MQ } = useLogin();
   const [present] = useIonToast();
+  const [openLoading, closeLoading] = useIonLoading();
   const {
     userInfo,
     isMobile = false,
@@ -183,8 +184,10 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
                 onClick={async () => {
                   if (!store.client) {
                     store.setShowModal(true);
+                    await openLoading('Loading')
                     await loginWeb3MQ();
                     await store.setUserDid();
+                    await closeLoading()
                     store.setShowModal(false);
                   } else {
                     setShowModal(true);
@@ -219,8 +222,10 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
                 className={ss.connectAccountIcon}
                 onClick={async () => {
                   if (!store.client) {
+                    await openLoading('Loading')
                     await loginWeb3MQ();
                     await store.setUserDid();
+                    await closeLoading()
                   } else {
                     setShowModal(true);
                     setPageType(ACCOUNT_CONNECT_TYPE.EMAIL);
@@ -262,10 +267,10 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
               <div
                 className={ss.connectAccountIcon}
                 onClick={async () => {
-                  store.setShowLoading(true);
+                  await openLoading('Loading');
                   await loginWeb3MQ();
                   await store.setUserDid();
-                  store.setShowLoading(false);
+                  await closeLoading();
                 }}
               >
                 <img
@@ -371,14 +376,19 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
               />
             </div>
           </div>
-          <div className={ss.followInfoBox} onClick={async () => {
-            store.setShowModal(true);
-            store.setPageType(PAGE_TYPE.SUBSCRIBERS);
-            if (store.contacts.length <= 0 || store.followers.length <= 0) {
-              await store.getContacts(userInfo.ownedBy);
-              await store.getFollowers(userInfo.id);
-            }
-          }}>
+          <div
+            className={ss.followInfoBox}
+            onClick={async () => {
+              store.setShowModal(true);
+              store.setPageType(PAGE_TYPE.SUBSCRIBERS);
+              if (store.contacts.length <= 0 || store.followers.length <= 0) {
+                await openLoading('Loading')
+                await store.getContacts(userInfo.ownedBy);
+                await store.getFollowers(userInfo.id);
+                await closeLoading()
+              }
+            }}
+          >
             <div className={ss.followNumBox}>
               <div
                 className={ss.number}
@@ -414,7 +424,7 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
   const handleFollow = async () => {
     //testnet.lenster.xyz/u/ramtest.test
     window.open(`https://testnet.lenster.xyz/u/${store.userInfo.handle}`);
-    // store.setShowLoading(true);
+    // await openLoading('Loading');
     // if (store.loginUserInfo.followModule) {
     //   const followRes = await follow(store.userInfo.id);
     //   console.log(followRes, "followRes");
@@ -430,7 +440,7 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
     //     console.log(followRes, "followRes");
     //   }
     // }
-    // store.setShowLoading(false);
+    // await closeLoading();
   };
   const handleSendMessage = async () => {
     // window.open("https://c.web3messaging.online/");

@@ -7,7 +7,8 @@ import ss from "./index.module.scss";
 import { useStore } from "../../services/mobx/service";
 import {
   getShortAddressByAddress,
-  TOKEN_KEY, tokenMgr,
+  TOKEN_KEY,
+  tokenMgr,
 } from "../../constant/utils";
 import { PAGE_TYPE } from "../../constant/enum";
 import cx from "classnames";
@@ -19,11 +20,11 @@ import { authenticate, challenge, client } from "../../lens/api";
 import { ethers } from "ethers";
 import { Client } from "web3-mq";
 import { getProfilesRequest } from "../../lens/lens/get-profile";
-import { useIonToast } from "@ionic/react";
+import { useIonLoading, useIonToast } from "@ionic/react";
 
 interface IAppProps {
   isMobile: boolean;
-  isLensStyle?: boolean
+  isLensStyle?: boolean;
 }
 
 const Header: React.FC<IAppProps> = (props) => {
@@ -32,7 +33,8 @@ const Header: React.FC<IAppProps> = (props) => {
   const { keys, signMetaMask, init, logout } = useLogin();
   const [open] = useIonToast();
   const [address, setAddress] = useState();
-  const { isMobile, isLensStyle = false} = props;
+  const [openLoading, closeLoading] = useIonLoading();
+  const { isMobile, isLensStyle = false } = props;
 
   useEffect(() => {
     /* when the app loads, check to see if the user has already connected their wallet */
@@ -59,18 +61,18 @@ const Header: React.FC<IAppProps> = (props) => {
   }
 
   async function login() {
-    store.setShowLoading(true);
+    await openLoading("Loading");
     try {
       client.defaultOptions = {
         watchQuery: {
-          fetchPolicy: 'no-cache',
-          errorPolicy: 'ignore',
+          fetchPolicy: "no-cache",
+          errorPolicy: "ignore",
         },
         query: {
-          fetchPolicy: 'no-cache',
-          errorPolicy: 'all',
+          fetchPolicy: "no-cache",
+          errorPolicy: "all",
         },
-      }
+      };
       /* first request the challenge from the API server */
       const challengeInfo = await client.query({
         query: challenge,
@@ -113,31 +115,31 @@ const Header: React.FC<IAppProps> = (props) => {
           window.open("https://testnet.lenster.xyz/");
         }, 3000);
       }
-      store.setShowLoading(false);
+      await closeLoading();
     } catch (err) {
-      store.setShowLoading(false);
+      await closeLoading();
       console.log("Error signing in: ", err);
     }
   }
 
   const handleLoginOut = () => {
-    logout()
+    logout();
     store.logout();
   };
   const handleSubscribers = async () => {
     store.setShowModal(true);
     store.setPageType(PAGE_TYPE.SUBSCRIBERS);
     if (store.contacts.length <= 0 || store.followers.length <= 0) {
+      await openLoading('Loading')
       await store.getContacts(store.loginUserInfo.ownedBy);
       await store.getFollowers(store.loginUserInfo.id);
+      await closeLoading()
     }
   };
-
 
   const handleProfile = async () => {
     if (store.loginUserInfo && store.loginUserInfo.handle) {
       history.push(`/home/${store.loginUserInfo.handle}`);
-      await store.getUserInfo(store.loginUserInfo.handle);
     }
   };
 
@@ -170,9 +172,11 @@ const Header: React.FC<IAppProps> = (props) => {
         <div className={ss.headRight}>
           <div className={ss.userInfo}>
             {!isMobile && (
-              <div className={cx(ss.name, {
-                [ss.lensName]: isLensStyle
-              })}>
+              <div
+                className={cx(ss.name, {
+                  [ss.lensName]: isLensStyle,
+                })}
+              >
                 <div className={ss.successConnectedBox}></div>
                 {`Connected to ${getShortAddressByAddress(
                   store.loginUserInfo.ownedBy
@@ -216,17 +220,23 @@ const Header: React.FC<IAppProps> = (props) => {
     }
     if (!address) {
       return (
-        <div  className={cx(ss.connectBtn, {
-          [ss.lensConnectBtn]: isLensStyle
-        })} onClick={connect}>
+        <div
+          className={cx(ss.connectBtn, {
+            [ss.lensConnectBtn]: isLensStyle,
+          })}
+          onClick={connect}
+        >
           Connect wallet
         </div>
       );
     } else {
       return (
-        <div className={cx(ss.connectBtn, {
-          [ss.lensConnectBtn]: isLensStyle
-        })} onClick={handleLogin}>
+        <div
+          className={cx(ss.connectBtn, {
+            [ss.lensConnectBtn]: isLensStyle,
+          })}
+          onClick={handleLogin}
+        >
           Login
         </div>
       );
@@ -237,7 +247,7 @@ const Header: React.FC<IAppProps> = (props) => {
       <div
         className={cx(ss.header, {
           [ss.mobileHeader]: isMobile,
-          [ss.lensHeader]: isLensStyle
+          [ss.lensHeader]: isLensStyle,
         })}
         style={
           store.userInfo?.coverPicture?.original?.url
@@ -254,7 +264,11 @@ const Header: React.FC<IAppProps> = (props) => {
           })}
         >
           <div className={ss.headLeft}>
-            <img style={ isLensStyle ? { height: '70px' } : {} } src={isLensStyle ? lensLogoIcon : headerLogo } alt="" />
+            <img
+              style={isLensStyle ? { height: "70px" } : {}}
+              src={isLensStyle ? lensLogoIcon : headerLogo}
+              alt=""
+            />
           </div>
           <RenderLoginBar />
         </div>

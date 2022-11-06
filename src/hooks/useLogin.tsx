@@ -2,14 +2,13 @@ import { useMemo, useState } from "react";
 import { Client, KeyPairsType } from "web3-mq";
 import { useStore } from "../services/mobx/service";
 import { TOKEN_KEY, tokenMgr } from "../constant/utils";
-import {authenticate, challenge, client} from "../lens/api";
-import {ethers} from "ethers";
-import {getProfilesRequest} from "../lens/lens/get-profile";
-import {useHistory} from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import { useIonLoading } from "@ionic/react";
 
 const useLogin = () => {
   const store = useStore();
-  const history = useHistory()
+  const [openLoading, closeLoading] = useIonLoading();
+  const history = useHistory();
   const hasKeys = useMemo(() => {
     const PrivateKey = localStorage.getItem("PRIVATE_KEY") || "";
     const PublicKey = localStorage.getItem("PUBLICKEY") || "";
@@ -58,21 +57,31 @@ const useLogin = () => {
   const logout = () => {
     localStorage.clear();
     setKeys(null);
-    setLensToken(null)
-    history.push('/auth')
+    setLensToken(null);
+    history.push("/auth");
   };
 
   const loginWeb3MQ = async () => {
-    store.setShowLoading(true)
+    await openLoading('Loading');
     if (!keys) {
       await signMetaMask();
     } else {
       await init();
       store.setClient(Client.getInstance(keys));
     }
-    store.setShowLoading(false)
+    await closeLoading();
   };
-  return { keys, fastestUrl, init, signMetaMask, logout, loginWeb3MQ, hasLensToken, lensToken, setLensToken };
+  return {
+    keys,
+    fastestUrl,
+    init,
+    signMetaMask,
+    logout,
+    loginWeb3MQ,
+    hasLensToken,
+    lensToken,
+    setLensToken,
+  };
 };
 
 export default useLogin;

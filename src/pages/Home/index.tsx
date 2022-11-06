@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
 import ss from "./index.module.scss";
-import { IonLoading, IonModal, useIonToast } from "@ionic/react";
+import {IonLoading, IonModal, useIonLoading, useIonToast} from "@ionic/react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../../services/mobx/service";
 import { RouteComponentProps } from "react-router";
@@ -26,6 +26,7 @@ const Home: React.FC<RouteComponentProps<MatchParams>> = observer((props) => {
   const store = useStore();
   const history = useHistory();
   const [open] = useIonToast();
+  const [openLoading, closeLoading] = useIonLoading();
   const { keys, init, signMetaMask, lensToken } = useLogin();
 
   if (!keys || !lensToken) {
@@ -34,13 +35,13 @@ const Home: React.FC<RouteComponentProps<MatchParams>> = observer((props) => {
   }
   useEffect(() => {
     // if (!store.userInfo) {
-    console.log(lensHandle, 'set lens user info')
+    console.log(lensHandle, "set lens user info");
     store.getUserInfo(lensHandle).then();
     // }
   }, [lensHandle]);
   const initRender = async () => {
     if (!store.loginUserInfo) {
-      store.setShowLoading(true);
+      await openLoading('Loading');
       await init();
       store.setClient(Client.getInstance(keys));
       let address = getUserInfoByJWT().id;
@@ -51,7 +52,7 @@ const Home: React.FC<RouteComponentProps<MatchParams>> = observer((props) => {
         await store.setLoginUserInfo(profile.items[0]);
       }
       history.push(`/home/${store.loginUserInfo.handle}`);
-      store.setShowLoading(false);
+      await closeLoading();
     }
   };
 
@@ -64,14 +65,14 @@ const Home: React.FC<RouteComponentProps<MatchParams>> = observer((props) => {
   }, []);
   return (
     <div className={ss.profileContainer}>
-      <Header isMobile={store.isMobile} isLensStyle={true}/>
+      <Header isMobile={store.isMobile} isLensStyle={true} />
       <div className={ss.profileContentBox}>
         <div className={ss.profileContent}>
           {!store.userInfo ? (
             <HomePageSkeleton />
           ) : (
             <MemberProfileModal
-                isLensStyle={true}
+              isLensStyle={true}
               userInfo={store.userInfo}
               isMobile={store.isMobile}
             />

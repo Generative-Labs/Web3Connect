@@ -70,11 +70,6 @@ const App: React.FC = observer(() => {
             </Suspense>
           </IonRouterOutlet>
         </IonReactRouter>
-        <IonLoading
-            isOpen={store.showLoading}
-            onDidDismiss={() => store.setShowLoading(false)}
-            message={"Loading"}
-        />
       </IonContent>
     </IonApp>
   );

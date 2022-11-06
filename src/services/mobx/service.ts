@@ -8,7 +8,6 @@ import {followers, following} from "../../lens/lens/follow";
 
 export default class AppStore {
   @observable isMobile: boolean = window.innerWidth <= 600;
-  @observable showLoading: boolean = false;
   @observable userInfo: any | null = null;
   @observable loginUserInfo: any | null = null;
   @observable pageType: PAGE_TYPE = PAGE_TYPE.PROFILE;
@@ -32,10 +31,6 @@ export default class AppStore {
 
   @action setIsMobile(data: boolean) {
     this.isMobile = data;
-  }
-
-  @action setShowLoading(data: boolean) {
-    this.showLoading = data;
   }
 
   @action setUserPhone(data: string) {
@@ -63,21 +58,18 @@ export default class AppStore {
 
   @action
   async getUserInfo(handle: string) {
-    this.setShowLoading(true);
     try {
       this.userInfo = await getProfileRequest({
         handle,
       });
-      this.setShowLoading(false);
     } catch (e) {
-      this.setShowLoading(false);
+      console.log(e, 'e')
     }
   }
 
   @action
   async setUserDid() {
     if (this.client) {
-      this.setShowLoading(true);
       if (this.loginUserInfo.handle) {
         console.log("bind lens");
         await this.client.user
@@ -109,13 +101,11 @@ export default class AppStore {
           this.userPhone = phoneInfo.did_value;
         }
       }
-      this.setShowLoading(false);
     }
   }
 
   @action
   async getContacts(address: string) {
-    this.setShowLoading(true);
     const res = await following(address);
     if (res.items) {
       this.contacts = res.items.map(item => {
@@ -124,17 +114,12 @@ export default class AppStore {
     } else {
       this.contacts = []
     }
-    console.log(res, 'following')
-    // this.contacts = [...oriChatData, ...data];
-    this.setShowLoading(false);
   }
 
   @action
   async getFollowers(profileId: string) {
-    this.setShowLoading(true);
     try {
       const res = await followers(profileId);
-      console.log(res, "res");
       if (res.items) {
         let users = []
         for (let i = 0; i < res.items.length; i++) {
@@ -156,16 +141,13 @@ export default class AppStore {
         this.followers = users
       }
 
-      this.setShowLoading(false);
     } catch (e) {
       console.log(e, 'follow - e')
-      this.setShowLoading(false);
     }
   }
 
   @action logout() {
     localStorage.clear();
-    this.showLoading = false;
     this.loginUserInfo = null;
   }
 
@@ -173,9 +155,7 @@ export default class AppStore {
   async setLoginUserInfo(lensProfile: any) {
     this.loginUserInfo = lensProfile;
     if (this.client) {
-      this.setShowLoading(true);
       await this.setUserDid();
-      this.setShowLoading(false);
     }
   }
 

@@ -10,7 +10,7 @@ import {
   IonInput,
   IonPage,
   IonTitle,
-  IonToolbar,
+  IonToolbar, useIonLoading,
   useIonToast,
 } from "@ionic/react";
 import { observer } from "mobx-react-lite";
@@ -52,7 +52,7 @@ const pageConfig = {
     stepTwoContentTitle: "Please enter 6-digit code sent to you phone",
     successTitle: "Your phone is verified",
     successSubTitle:
-      "Congratulation! Your phone number successfully links to your SwapChat.",
+      "Congratulation! Your phone number successfully links to your Web3MQ.",
   },
 };
 
@@ -60,28 +60,40 @@ const ConnectAccountModal: React.FC<IAppProps> = observer((props) => {
   const { type, closeModal } = props;
   const store = useStore();
   const [openToast] = useIonToast();
+  const [openLoading, closeLoading] = useIonLoading();
 
   const [step, setStep] = useState<number>(1);
-  const [inputValue, setInputValue] = useState(type === ACCOUNT_CONNECT_TYPE.PHONE ? '+1': '');
+  const [inputValue, setInputValue] = useState(
+    type === ACCOUNT_CONNECT_TYPE.PHONE ? "+1" : ""
+  );
   const [codeValue, setCodeValue] = useState("");
 
   const sendAccountConnectCode = async () => {
     if (store.client) {
-      store.setShowLoading(true);
+      await openLoading('Loading');
       const res = await store.client.user.userBindDid({
-        provider_id: type === ACCOUNT_CONNECT_TYPE.PHONE ? PROVIDER_ID_CONFIG.sms : PROVIDER_ID_CONFIG.email,
-        did_type: type === ACCOUNT_CONNECT_TYPE.EMAIL ? WEB3_MQ_DID_TYPE.EMAIL : WEB3_MQ_DID_TYPE.PHONE,
+        provider_id:
+          type === ACCOUNT_CONNECT_TYPE.PHONE
+            ? PROVIDER_ID_CONFIG.sms
+            : PROVIDER_ID_CONFIG.email,
+        did_type:
+          type === ACCOUNT_CONNECT_TYPE.EMAIL
+            ? WEB3_MQ_DID_TYPE.EMAIL
+            : WEB3_MQ_DID_TYPE.PHONE,
         did_value: inputValue,
       });
-      console.log(res, 'res')
-      store.setShowLoading(false);
+      console.log(res, "res");
+      await closeLoading();
       if (res.code === 0) {
         await openToast(res.msg, 3000);
         if (type === ACCOUNT_CONNECT_TYPE.EMAIL) {
           setStep(3);
         } else {
           if (res.data && res.data.verification_key) {
-            localStorage.setItem('sms_verification_key', res.data.verification_key)
+            localStorage.setItem(
+              "sms_verification_key",
+              res.data.verification_key
+            );
           }
           setStep(2);
         }
@@ -91,35 +103,39 @@ const ConnectAccountModal: React.FC<IAppProps> = observer((props) => {
   const verifyAccountConnect = async () => {
     if (store.client) {
       const res = await store.client.user.userBindDid({
-        provider_id:PROVIDER_ID_CONFIG.sms,
+        provider_id: PROVIDER_ID_CONFIG.sms,
         did_type: WEB3_MQ_DID_TYPE.PHONE,
         did_value: inputValue,
-        did_content: `${localStorage.getItem('sms_verification_key')}@${codeValue}`,
-        did_action: 'verification'
-      })
-      console.log(res, 'res')
-
+        did_content: `${localStorage.getItem(
+          "sms_verification_key"
+        )}@${codeValue}`,
+        did_action: "verification",
+      });
+      console.log(res, "res");
     }
-
 
     setStep(3);
   };
 
   const handleConnectSuccess = async () => {
     if (store.client) {
-      store.setShowLoading(true);
+      await openLoading('Loading');
       const dids = await store.client.user.getUserBindDids();
-      store.setShowLoading(false);
+      await closeLoading();
       if (dids.length > 0) {
         let didInfo = null;
         if (type === ACCOUNT_CONNECT_TYPE.EMAIL) {
-          didInfo = dids.find((item: any) => item.did_type === WEB3_MQ_DID_TYPE.EMAIL);
+          didInfo = dids.find(
+            (item: any) => item.did_type === WEB3_MQ_DID_TYPE.EMAIL
+          );
           if (didInfo) {
             store.setUserEmail(didInfo.did_value);
             closeModal();
           }
         } else {
-          didInfo = dids.find((item: any) => item.did_type === WEB3_MQ_DID_TYPE.PHONE);
+          didInfo = dids.find(
+            (item: any) => item.did_type === WEB3_MQ_DID_TYPE.PHONE
+          );
           if (didInfo) {
             store.setUserPhone(didInfo.did_value);
             closeModal();

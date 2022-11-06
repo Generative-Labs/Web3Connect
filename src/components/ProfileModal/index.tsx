@@ -96,7 +96,6 @@ const ProfileModal: React.FC = observer(() => {
                 if (user.ownedBy) {
                   history.push(`/home/${user.handle}`);
                   // store.emptyUserInfo();
-                  await store.getUserInfo(user.ownedBy);
                   store.setShowModal(false);
                   store.setPageType(PAGE_TYPE.PROFILE);
                 }
