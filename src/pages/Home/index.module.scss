@@ -1,0 +1,21 @@
+.profileContainer {
+
+}
+
+.profileContentBox {
+  width: 100%;
+  height: calc(100vh - 180px);
+  display: flex;
+  justify-content: center;
+}
+.profileContent {
+  width: 648px;
+  height: 100%;
+  background: rgba(245, 245, 245, 0.5);
+}
+
+.profileSetting {
+  width: 1238px;
+  height: 100%;
+  background: rgba(245, 245, 245, 0.5);
+}

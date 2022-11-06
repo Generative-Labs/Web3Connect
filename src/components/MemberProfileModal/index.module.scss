@@ -1,0 +1,379 @@
+
+.content {
+  //--padding-start: 34px;
+  //--padding-end: 34px;
+  height: 100%;
+}
+
+
+.userInfoBox {
+  margin-top: -60px;
+  z-index: 9990;
+
+  .avatarBox {
+    margin: auto;
+    background: #fff;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 20px 30px rgba(212, 215, 224, 0.4);
+    backdrop-filter: blur(27.1828px);
+
+    .avatarImg {
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+
+  }
+
+  .usernameBox {
+    margin-top: 28px;
+
+
+
+    .handle {
+      font-family: 'Helvetica Neue', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      color: #000000;
+      text-align: center;
+      font-size: 24px;
+      line-height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+    }
+    .username {
+      font-family: 'Helvetica Neue', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      color: #8c63f1;
+      text-align: center;
+      font-size: 14px;
+      line-height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+    }
+    .lensUserName {
+      color:  #085727 !important;
+    }
+
+    .walletBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+
+      .wallet {
+        background: #FFFFFF;
+        height: 38px;
+        width: 184px;
+        border: 1px solid #DADADA;
+        border-radius: 44px;
+        margin-top: 4px;
+        line-height: 38px;
+        font-family: 'Helvetica Neue', sans-serif;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        color: #000000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .copyIcon {
+          margin-left: 10px;
+
+        }
+
+        .copyIcon:hover {
+          opacity: 0.6;
+          cursor: pointer;
+        }
+      }
+
+
+      //.user-wallet-toggle-box {
+      //  height: 100%;
+      //  display: flex;
+      //  justify-content: center;
+      //  align-items: center;
+      //  font-family: 'Helvetica Neue', sans-serif;
+      //  font-style: normal;
+      //  font-weight: 400;
+      //  font-size: 14px;
+      //  color: #000000;
+      //
+      //  .username-copy-icon {
+      //
+      //  }
+      //
+      //  .username-copy-icon:hover {
+      //    opacity: 0.6;
+      //    cursor: pointer;
+      //  }
+      //}
+    }
+    .lensWalletBox {
+      .wallet {
+        border: 1px solid #085727 !important;
+        color: #085727 !important;
+      }
+    }
+    .followInfoBox {
+      display: flex;
+      justify-content: center;
+      font-family: 'Helvetica Neue', sans-serif;
+      margin-top: 20px;
+      .followNumBox {
+        margin: 0 10px;
+        display: flex;
+        .number{
+          font-size: 20px;
+          color: #000;
+          font-weight: 400;
+          margin-right: 8px;
+
+        }
+        .text {
+          margin-top: 5px;
+          color: rgb(113, 113, 122);
+          font-size: 16px;
+        }
+      }
+
+      &:hover{
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.mobileUserInfoBox {
+  margin-top: -40px;
+  //.mobileAvatarBox {
+  .avatarBox {
+    width: 80px;
+    height: 80px;
+    .avatarImg {
+      width: 76px;
+      height: 76px;
+    }
+  }
+}
+
+.profileAuditButtonBox {
+  margin-top: 18px;
+  padding: 0 34px;
+  width: 100%;
+  display: flex;
+
+  ion-button {
+    flex: 1;
+    height: 39px;
+    --background: #fff;
+    --background-activated: #fff;
+    --background-hover: #ccc;
+    --background-hover-opacity: 0.1;
+    --border-style: solid;
+    --border-width: 1px;
+    --border-color: #DADADA;
+    --border-radius: 61px;
+    --color: #605DEC;
+    margin-left: 4px;
+    margin-right: 4px;
+
+    img {
+      margin-right: 5px;
+    }
+  }
+
+  .followButton {
+    --background: #605DEC;
+    --color: #fff;
+    --border-width: 0;
+  }
+}
+.lensProfileAuditButtonBox {
+
+  ion-button {
+    --background-activated: #085727;
+    --border-color: #085727;
+    --color: #085727;
+  }
+  .followButton {
+    --background: #ABFD2C;
+    --border-width: 0;
+  }
+}
+
+.tabs {
+  margin-top: 31px;
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .tabsItem {
+    text-align: center;
+    height: 44px;
+    line-height: 44px;
+    width: 300px;
+    border-bottom: 1px solid #EBEBEB;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    color: #212121;
+  }
+
+  .tabsItem:hover {
+    cursor: pointer;
+  }
+
+  .tabsItemChecked {
+    border-bottom: 2px solid #605DEC;
+    font-weight: 700;
+  }
+
+  .lensTabsItemChecked {
+    border-bottom: 2px solid #085727 !important;
+  }
+}
+
+
+.mobileTabs {
+  .tabsItem {
+    width: 33%;
+  }
+}
+
+.segmentContentBox {
+  margin-top: 24px;
+  padding: 0 24px;
+  height: calc(100% - 280px);
+  background: rgba(245, 245, 245, 0.5);
+  overflow: hidden;
+  overflow-y: auto;
+  //overflow-y: scroll;
+
+  .walletsListContent {
+    --padding-start: 34px;
+    --padding-end: 34px;
+    position: relative;
+
+    .walletsList {
+      display: flex;
+      align-items: center;
+      height: 43px;
+      margin-top: 12px;
+      border-bottom: 1px solid #EBEBEB;
+
+      img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 12px;
+      }
+
+      .profile-wallet-icon {
+        width: 24px;
+        height: auto;
+        border-radius: 0;
+      }
+
+      .profileItemLabel {
+        display: flex;
+        align-items: center;
+
+        .itemLabelTitle {
+          font-family: 'Helvetica Neue', sans-serif;
+          font-style: normal;
+          font-weight: 700;
+          font-size: 16px;
+          color: #000000;
+          margin-right: 12px;
+        }
+
+        .itemLabelAccountTitle {
+          font-family: 'Helvetica Neue', sans-serif;
+          font-style: normal;
+          font-weight: 500;
+          font-size: 16px;
+          color: #242424;
+          margin-right: 12px;
+        }
+
+        .itemLabelText {
+          margin-right: 5px;
+          font-family: 'Poppins', sans-serif;
+          font-style: normal;
+          font-weight: 400;
+          font-size: 14px;
+          color: #000000;
+          width: 258px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .connectAccountIcon {
+          position: absolute;
+          right: 10px;
+        }
+
+        .username-copy-icon {
+          width: 18px;
+          height: auto;
+        }
+
+        .username-copy-icon {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .emptyFeedBox {
+    margin-top: 80px;
+    .emptyEmoji {
+      font-size: 96px;
+      line-height: 115px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .emptyTextBox {
+      text-align: center;
+      width: 100%;
+      margin: auto;
+      .bigText{
+        font-weight: 500;
+        font-size: 24px;
+        line-height: 29px;
+      }
+    }
+
+
+  }
+}
+
+.profile-accounts-header {
+  padding-left: 10px;
+  margin-top: 32px;
+  margin-bottom: 18px;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #000000;
+}

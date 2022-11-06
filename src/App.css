@@ -1,0 +1,33 @@
+.modal-content-container{
+    padding-bottom: 10vh !important;
+}
+
+.house-super-chat-header {
+    display: flex;
+    background-color: #fff;
+    height: 65px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    padding-left: 24px;
+    align-items: center;
+    border-bottom: 1px solid #F2F2F2;
+}
+
+.house-super-chat-header img {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+.house-super-chat-header span {
+    margin: 0;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: bold;
+    color: #000000;
+}
+
+.app-content {
+    --overflow: hidden;
+
+}
