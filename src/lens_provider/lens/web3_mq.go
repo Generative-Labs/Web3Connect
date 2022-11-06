@@ -50,6 +50,10 @@ func PushPostEventsToWen3Mq() {
 		followers := db.GetFollowersByLensAccount(lensAccount)
 		for _, follower := range followers {
 			userId := db.GetUserIdByWallet(follower)
+			userIdExist := db.GetUserIdByWallet(follower)
+			if userIdExist == "" {
+				continue
+			}
 			followerLensAccount := db.GetLensAccountByWallet(follower)
 			add := fmt.Sprintf(`{"notificationUser":"%v",`, followerLensAccount)
 			content = add + content[1:]
