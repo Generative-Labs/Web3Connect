@@ -49,7 +49,7 @@ const Home: React.FC<RouteComponentProps<MatchParams>> = observer((props) => {
       if (profile && profile.items && profile.items.length > 0) {
         await store.setLoginUserInfo(profile.items[0]);
       }
-      history.push(`/home/${store.loginUserInfo.handle}`);
+      // history.push(`/home/${store.loginUserInfo.handle}`);
       await closeLoading();
     }
   };

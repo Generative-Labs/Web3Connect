@@ -36,7 +36,6 @@ const App: React.FC = observer(() => {
   setupIonicReact({
     mode: 'ios',
   });
-  const store = useStore()
 
 
   // useEffect(() => {
