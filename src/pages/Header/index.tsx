@@ -14,12 +14,10 @@ import { PAGE_TYPE } from "../../constant/enum";
 import cx from "classnames";
 import { useHistory } from "react-router-dom";
 import useLogin from "../../hooks/useLogin";
-import { getIPFSLink, imageProxy } from "../../lens/utils";
+import { getIPFSLink, imageProxy } from "../../constant/utils";
 import { COVER } from "../../constant";
-import { authenticate, challenge, client } from "../../lens/api";
+import {authenticate, challenge, client, getProfiles} from "../../lens/api";
 import { ethers } from "ethers";
-import { Client } from "web3-mq";
-import { getProfilesRequest } from "../../lens/lens/get-profile";
 import { useIonLoading, useIonToast } from "@ionic/react";
 
 interface IAppProps {
@@ -100,9 +98,7 @@ const Header: React.FC<IAppProps> = (props) => {
         },
       } = authData;
       tokenMgr().setToken(accessToken, TOKEN_KEY.LENS_ACCESS);
-      const profile = await getProfilesRequest({
-        ownedBy: address,
-      });
+      const profile = await getProfiles(address || '');
       if (profile && profile.items && profile.items.length > 0) {
         await store.setLoginUserInfo(profile.items[0]);
       } else {

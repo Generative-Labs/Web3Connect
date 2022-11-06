@@ -1,22 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ss from "./index.module.scss";
-import {IonButton, IonModal, useIonLoading, useIonToast} from "@ionic/react";
+import { IonButton, IonModal, useIonLoading, useIonToast } from "@ionic/react";
 import { useStore } from "src/services/mobx/service";
 import { observer } from "mobx-react-lite";
-import { getShortAddressByAddress } from "../../constant/utils";
+import {
+  getShortAddressByAddress,
+  TOKEN_KEY,
+  tokenMgr,
+} from "../../constant/utils";
 import { PAGE_TYPE, PLATFORM_ENUM } from "../../constant/enum";
 import cx from "classnames";
 import copy from "copy-to-clipboard";
 import ConnectAccountModal, {
   ACCOUNT_CONNECT_TYPE,
 } from "../ConnectAccountModal";
-import { getIPFSLink, imageProxy } from "../../lens/utils";
+import { getIPFSLink, imageProxy } from "../../constant/utils";
 import { COVER } from "../../constant";
-import { follow } from "../../lens/lens/follow";
-import { proxyActionFreeFollow } from "../../lens/lens/proxy-action-free-follow";
 import useLogin from "../../hooks/useLogin";
-import { profileFeed } from "../../lens/lens/get-profile";
-import { logoEuro } from "ionicons/icons";
 
 const userIcon =
   "https://s3.us-west-2.amazonaws.com/videos.house.west2/SwapChat-static/svg/user.svg";
@@ -25,18 +25,9 @@ const sendMessageIcon =
 const followIcon = require("../../assert/svg/followIcon.svg").default;
 const copyIcon = require("../../assert/svg/copyIcon.svg").default;
 const lensCopyIcon = require("../../assert/svg/lensCopyIcon.svg").default;
-const facebookIcon = require("../../assert/img/pre-facebook-icon.png").default;
 const twitterIcon = require("../../assert/svg/twitterIcon.svg").default;
-const openseaIcon = require("../../assert/svg/openseaIcon.svg").default;
-const discordIcon = require("../../assert/svg/discordIcon.svg").default;
-const insIcon = require("../../assert/img/pre-instagram-icon.png").default;
-const nextIdIcon = require("../../assert/img/nextIdIcon.jpeg").default;
 const profileENSIcon =
   "https://s3.us-west-2.amazonaws.com/videos.house.west2/SwapChat-static/svg/profileENSIcon.svg";
-const profileDotBitIcon =
-  require("../../assert/svg/profileDotBitIcon.svg").default;
-const profileNameTagIcon =
-  require("../../assert/svg/profileNameTagIcon.svg").default;
 const isBusinessUserIcon =
   require("../../assert/svg/isBusinessUser.svg").default;
 const emailIcon = require("../../assert/svg/emailIcon.svg").default;
@@ -44,33 +35,6 @@ const phoneIcon = require("../../assert/svg/phoneIcon.svg").default;
 const connectMoreAccountIcon =
   require("../../assert/svg/connectMoreAccountIcon.svg").default;
 
-const accountsConfigs = [
-  {
-    platform: PLATFORM_ENUM.TWITTER,
-    defaultIcon: twitterIcon,
-    title: "Twitter",
-  },
-  {
-    platform: PLATFORM_ENUM.OPENSEA,
-    defaultIcon: openseaIcon,
-    title: "OpenSea",
-  },
-  {
-    platform: PLATFORM_ENUM.DISCORD,
-    defaultIcon: discordIcon,
-    title: "Discord",
-  },
-  {
-    platform: PLATFORM_ENUM.FACEBOOK,
-    defaultIcon: facebookIcon,
-    title: "Facebook",
-  },
-  {
-    platform: PLATFORM_ENUM.INSTAGRAM,
-    defaultIcon: insIcon,
-    title: "Instagram",
-  },
-];
 
 interface IAppProps {
   userInfo: any;
@@ -79,14 +43,6 @@ interface IAppProps {
   isLensStyle?: boolean;
 }
 
-type dids = {
-  nextId: string;
-  ens: string;
-  dotBit: string[];
-  nameTag: string[];
-};
-
-const size = 30;
 const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
   const store = useStore();
   const { loginWeb3MQ } = useLogin();
@@ -99,37 +55,451 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
     isLensStyle = false,
   } = props;
   const [segmentValue, setSegmentValue] = useState("1");
-  const [isInfiniteDisabled, setIsInfiniteDisabled] = useState(false);
-  const [userNFTs, setUserNFTs] = useState<any[]>([]);
-
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [lensPosts, setLensPosts] = useState<any[]>([]);
   const [pageType, setPageType] = useState<ACCOUNT_CONNECT_TYPE>(
     ACCOUNT_CONNECT_TYPE.PHONE
   );
 
   const getUserNFTs = async (page: number = 1) => {
-    const res = await profileFeed(userInfo.id).catch((e) => {
-      console.log(e, "e");
-    });
-    console.log(res, "profileFeed -res");
+    const query = `query ProfileFeed($request: PublicationsQueryRequest!, $reactionRequest: ReactionFieldResolverRequest, $profileId: ProfileId) {
+  publications(request: $request) {
+    items {
+      ... on Post {
+        ...PostFields
+        __typename
+      }
+      ... on Comment {
+        ...CommentFields
+        __typename
+      }
+      ... on Mirror {
+        ...MirrorFields
+        __typename
+      }
+      __typename
+    }
+    pageInfo {
+      totalCount
+      next
+      __typename
+    }
+    __typename
+  }
+}
 
-    // if (nftData.data) {
-    //   if (nftData.data.assets.length < size) {
-    //     setIsInfiniteDisabled(true);
-    //   }
-    //   if (page === 1) {
-    //     setUserNFTs(nftData.data.assets);
-    //   } else {
-    //     setUserNFTs(nftData.data.assets.concat(userNFTs));
-    //   }
-    // }
-  };
+fragment PostFields on Post {
+  id
+  profile {
+    ...ProfileFields
+    __typename
+  }
+  reaction(request: $reactionRequest)
+  mirrors(by: $profileId)
+  canComment(profileId: $profileId) {
+    result
+    __typename
+  }
+  canMirror(profileId: $profileId) {
+    result
+    __typename
+  }
+  hasCollectedByMe
+  collectedBy {
+    address
+    defaultProfile {
+      ...ProfileFields
+      __typename
+    }
+    __typename
+  }
+  collectModule {
+    ...CollectModuleFields
+    __typename
+  }
+  stats {
+    ...StatsFields
+    __typename
+  }
+  metadata {
+    ...MetadataFields
+    __typename
+  }
+  hidden
+  createdAt
+  appId
+  __typename
+}
 
-  const loadData = async (ev: any) => {
-    let currentPage = (userNFTs.length / size).toFixed(0);
-    let item = +currentPage + 1;
-    await getUserNFTs(item);
-    ev.target.complete();
+fragment ProfileFields on Profile {
+  id
+  name
+  handle
+  bio
+  ownedBy
+  attributes {
+    key
+    value
+    __typename
+  }
+  picture {
+    ... on MediaSet {
+      original {
+        url
+        __typename
+      }
+      __typename
+    }
+    ... on NftImage {
+      uri
+      __typename
+    }
+    __typename
+  }
+  followModule {
+    __typename
+  }
+  __typename
+}
+
+fragment CollectModuleFields on CollectModule {
+  ... on FreeCollectModuleSettings {
+    type
+    contractAddress
+    followerOnly
+    __typename
+  }
+  ... on FeeCollectModuleSettings {
+    type
+    recipient
+    referralFee
+    contractAddress
+    followerOnly
+    amount {
+      asset {
+        symbol
+        decimals
+        address
+        __typename
+      }
+      value
+      __typename
+    }
+    __typename
+  }
+  ... on LimitedFeeCollectModuleSettings {
+    type
+    collectLimit
+    recipient
+    referralFee
+    contractAddress
+    followerOnly
+    amount {
+      asset {
+        symbol
+        decimals
+        address
+        __typename
+      }
+      value
+      __typename
+    }
+    __typename
+  }
+  ... on LimitedTimedFeeCollectModuleSettings {
+    type
+    collectLimit
+    recipient
+    endTimestamp
+    referralFee
+    contractAddress
+    followerOnly
+    amount {
+      asset {
+        symbol
+        decimals
+        address
+        __typename
+      }
+      value
+      __typename
+    }
+    __typename
+  }
+  ... on TimedFeeCollectModuleSettings {
+    type
+    recipient
+    endTimestamp
+    referralFee
+    contractAddress
+    followerOnly
+    amount {
+      asset {
+        symbol
+        decimals
+        address
+        __typename
+      }
+      value
+      __typename
+    }
+    __typename
+  }
+  __typename
+}
+
+fragment StatsFields on PublicationStats {
+  totalUpvotes
+  totalAmountOfMirrors
+  totalAmountOfCollects
+  totalAmountOfComments
+  __typename
+}
+
+fragment MetadataFields on MetadataOutput {
+  name
+  description
+  content
+  image
+  attributes {
+    traitType
+    value
+    __typename
+  }
+  cover {
+    original {
+      url
+      __typename
+    }
+    __typename
+  }
+  media {
+    original {
+      url
+      mimeType
+      __typename
+    }
+    __typename
+  }
+  __typename
+}
+
+fragment CommentFields on Comment {
+  id
+  profile {
+    ...ProfileFields
+    __typename
+  }
+  reaction(request: $reactionRequest)
+  mirrors(by: $profileId)
+  canComment(profileId: $profileId) {
+    result
+    __typename
+  }
+  canMirror(profileId: $profileId) {
+    result
+    __typename
+  }
+  hasCollectedByMe
+  collectedBy {
+    address
+    defaultProfile {
+      ...ProfileFields
+      __typename
+    }
+    __typename
+  }
+  collectModule {
+    ...CollectModuleFields
+    __typename
+  }
+  stats {
+    ...StatsFields
+    __typename
+  }
+  metadata {
+    ...MetadataFields
+    __typename
+  }
+  hidden
+  createdAt
+  appId
+  commentOn {
+    ... on Post {
+      ...PostFields
+      __typename
+    }
+    ... on Comment {
+      id
+      profile {
+        ...ProfileFields
+        __typename
+      }
+      reaction(request: $reactionRequest)
+      mirrors(by: $profileId)
+      canComment(profileId: $profileId) {
+        result
+        __typename
+      }
+      canMirror(profileId: $profileId) {
+        result
+        __typename
+      }
+      hasCollectedByMe
+      collectedBy {
+        address
+        defaultProfile {
+          handle
+          __typename
+        }
+        __typename
+      }
+      collectModule {
+        ...CollectModuleFields
+        __typename
+      }
+      metadata {
+        ...MetadataFields
+        __typename
+      }
+      stats {
+        ...StatsFields
+        __typename
+      }
+      mainPost {
+        ... on Post {
+          ...PostFields
+          __typename
+        }
+        ... on Mirror {
+          ...MirrorFields
+          __typename
+        }
+        __typename
+      }
+      hidden
+      createdAt
+      __typename
+    }
+    ... on Mirror {
+      ...MirrorFields
+      __typename
+    }
+    __typename
+  }
+  __typename
+}
+
+fragment MirrorFields on Mirror {
+  id
+  profile {
+    ...ProfileFields
+    __typename
+  }
+  reaction(request: $reactionRequest)
+  canComment(profileId: $profileId) {
+    result
+    __typename
+  }
+  canMirror(profileId: $profileId) {
+    result
+    __typename
+  }
+  collectModule {
+    ...CollectModuleFields
+    __typename
+  }
+  stats {
+    ...StatsFields
+    __typename
+  }
+  metadata {
+    ...MetadataFields
+    __typename
+  }
+  hidden
+  mirrorOf {
+    ... on Post {
+      ...PostFields
+      __typename
+    }
+    ... on Comment {
+      id
+      profile {
+        ...ProfileFields
+        __typename
+      }
+      reaction(request: $reactionRequest)
+      mirrors(by: $profileId)
+      canComment(profileId: $profileId) {
+        result
+        __typename
+      }
+      canMirror(profileId: $profileId) {
+        result
+        __typename
+      }
+      stats {
+        ...StatsFields
+        __typename
+      }
+      createdAt
+      __typename
+    }
+    __typename
+  }
+  createdAt
+  appId
+  __typename
+}`;
+    const variables = {
+      profileId: userInfo.id,
+      request: {
+        limit: 50,
+        metadata: null,
+        profileId: userInfo.id,
+        publicationTypes: ["POST", "MIRROR"],
+      },
+      reactionRequest: {
+        profileId: userInfo.id,
+      },
+    };
+    const res = await fetch("https://api-mumbai.lens.dev/", {
+      headers: {
+        accept: "*/*",
+        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+        "content-type": "application/json",
+        "sec-ch-ua":
+          '"Microsoft Edge";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "cross-site",
+        "x-access-token": tokenMgr().getToken(TOKEN_KEY.LENS_ACCESS),
+      },
+      referrerPolicy: "strict-origin",
+      body: JSON.stringify({
+        operationName: "ProfileFeed",
+        query,
+        variables,
+      }),
+      method: "POST",
+      mode: "cors",
+      credentials: "omit",
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .catch((e) => {
+        console.log(e, "e");
+      });
+    if (res.data && res.data.publications && res.data.publications.items) {
+      let items = res.data.publications.items;
+      if (items.length > 0) {
+        setLensPosts(items);
+      }
+    }
   };
 
   useEffect(() => {
@@ -174,7 +544,7 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
           <div className={ss.profileItemLabel}>
             <div className={ss.itemLabelAccountTitle}>Phone</div>
             <div className={ss.itemLabelText}>
-              {store.userPhone || "Coming Soon"}
+              {getShortAddressByAddress(store.userPhone, 4, 3) || "Coming Soon"}
             </div>
             {loginUserInfo &&
             userInfo.ownedBy === loginUserInfo.ownedBy &&
@@ -184,10 +554,10 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
                 onClick={async () => {
                   if (!store.client) {
                     store.setShowModal(true);
-                    await openLoading('Loading')
+                    await openLoading("Loading");
                     await loginWeb3MQ();
                     await store.setUserDid();
-                    await closeLoading()
+                    await closeLoading();
                     store.setShowModal(false);
                   } else {
                     setShowModal(true);
@@ -222,10 +592,10 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
                 className={ss.connectAccountIcon}
                 onClick={async () => {
                   if (!store.client) {
-                    await openLoading('Loading')
+                    await openLoading("Loading");
                     await loginWeb3MQ();
                     await store.setUserDid();
-                    await closeLoading()
+                    await closeLoading();
                   } else {
                     setShowModal(true);
                     setPageType(ACCOUNT_CONNECT_TYPE.EMAIL);
@@ -267,7 +637,7 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
               <div
                 className={ss.connectAccountIcon}
                 onClick={async () => {
-                  await openLoading('Loading');
+                  await openLoading("Loading");
                   await loginWeb3MQ();
                   await store.setUserDid();
                   await closeLoading();
@@ -382,10 +752,10 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
               store.setShowModal(true);
               store.setPageType(PAGE_TYPE.SUBSCRIBERS);
               if (store.contacts.length <= 0 || store.followers.length <= 0) {
-                await openLoading('Loading')
+                await openLoading("Loading");
                 await store.getContacts(userInfo.ownedBy);
                 await store.getFollowers(userInfo.id);
-                await closeLoading()
+                await closeLoading();
               }
             }}
           >
@@ -420,6 +790,39 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
       </div>
     );
   }, [isMobile, userInfo]);
+
+  const RenderSinglePost = useCallback(
+    (props) => {
+      const { post } = props;
+      const { profile, stats, metadata } = post;
+      return (
+        <div className={ss.postItemBox}>
+          <div className={ss.leftBox}>
+            <img
+              src={
+                imageProxy(
+                  getIPFSLink(profile?.picture?.original?.url),
+                  COVER
+                ) || userIcon
+              }
+              alt=""
+            />
+          </div>
+          <div className={ss.centerBox}>
+            <div className={ss.creatorInfoBox}>
+              <div className={ss.upName}>{profile.name || profile.handle}</div>
+              <div className={ss.downName}>{profile.handle}</div>
+            </div>
+            <div className={ss.postContent}>{metadata.content}</div>
+          </div>
+          {/*<div className={ss.rightBox}>*/}
+          {/*  {moment(post.createdAt).locale().}*/}
+          {/*</div>*/}
+        </div>
+      );
+    },
+    [lensPosts]
+  );
 
   const handleFollow = async () => {
     //testnet.lenster.xyz/u/ramtest.test
@@ -498,7 +901,6 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
     <div className={ss.content}>
       <RenderUserInfo />
       <RenderAuditBox />
-
       <div
         className={cx(ss.tabs, {
           [ss.mobileTabs]: isMobile,
@@ -530,7 +932,7 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
       <div className={ss.segmentContentBox}>
         {segmentValue === "1" && (
           <>
-            {needName ? (
+            {lensPosts.length <= 0 || !needName ? (
               <div className={ss.emptyFeedBox}>
                 <div className={ss.emptyEmoji}>🗒</div>
                 <div className={ss.emptyTextBox}>
@@ -539,12 +941,17 @@ const MemberProfileModal: React.FC<IAppProps> = observer((props) => {
                   >{`@${userInfo.handle} hasn't posted anything yet!`}</p>
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <div className={ss.postBox}>
+                {lensPosts.map((item, index) => (
+                  <RenderSinglePost post={item} key={index} />
+                ))}
+              </div>
+            )}
           </>
         )}
         {segmentValue === "2" && <RenderAccountsList />}
       </div>
-
       <IonModal
         isOpen={showModal}
         //@ts-ignore

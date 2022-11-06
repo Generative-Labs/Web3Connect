@@ -2,9 +2,8 @@ import { action, makeAutoObservable, observable } from "mobx";
 import React from "react";
 import {PAGE_TYPE, WEB3_MQ_DID_TYPE} from "../../constant/enum";
 import { Client } from "web3-mq";
-import {getProfileRequest, getProfilesRequest} from "../../lens/lens/get-profile";
 import { PROVIDER_ID_CONFIG } from "../../constant";
-import {followers, following} from "../../lens/lens/follow";
+import {getFollowerData, getFollowingData, getProfile, getProfiles} from "../../lens/api";
 
 export default class AppStore {
   @observable isMobile: boolean = window.innerWidth <= 600;
@@ -59,9 +58,8 @@ export default class AppStore {
   @action
   async getUserInfo(handle: string) {
     try {
-      this.userInfo = await getProfileRequest({
-        handle,
-      });
+      this.userInfo = await getProfile(handle);
+      console.log(this.userInfo, 'userInfo - new')
     } catch (e) {
       console.log(e, 'e')
     }
@@ -106,9 +104,9 @@ export default class AppStore {
 
   @action
   async getContacts(address: string) {
-    const res = await following(address);
+    const res = await getFollowingData(address);
     if (res.items) {
-      this.contacts = res.items.map(item => {
+      this.contacts = res.items.map((item: any) => {
         return item.profile
       })
     } else {
@@ -119,15 +117,16 @@ export default class AppStore {
   @action
   async getFollowers(profileId: string) {
     try {
-      const res = await followers(profileId);
+      const res = await getFollowerData(profileId);
       if (res.items) {
         let users = []
         for (let i = 0; i < res.items.length; i++) {
           let item = res.items[i]
           if (item.wallet.address) {
-            const profile = await getProfilesRequest({
-              ownedBy: item.wallet.address,
-            });
+            const profile = await getProfiles(item.wallet.address)
+            // const profile = await getProfilesRequest({
+            //   ownedBy: item.wallet.address,
+            // });
             let userInfo = {}
             if (profile && profile.items && profile.items.length > 0) {
               userInfo = profile.items[0]

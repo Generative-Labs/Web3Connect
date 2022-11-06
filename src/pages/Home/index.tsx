@@ -13,9 +13,9 @@ import { PAGE_TYPE } from "../../constant/enum";
 import { Client } from "web3-mq";
 import useLogin from "../../hooks/useLogin";
 import { getUserInfoByJWT, TOKEN_KEY, tokenMgr } from "../../constant/utils";
-import { getProfilesRequest } from "../../lens/lens/get-profile";
 import Web3MQChat from "../../components/Web3MQChat";
 import { useHistory } from "react-router-dom";
+import {getProfiles} from "../../lens/api";
 
 interface MatchParams {
   handle: string;
@@ -45,9 +45,7 @@ const Home: React.FC<RouteComponentProps<MatchParams>> = observer((props) => {
       await init();
       store.setClient(Client.getInstance(keys));
       let address = getUserInfoByJWT().id;
-      const profile = await getProfilesRequest({
-        ownedBy: address,
-      });
+      const profile = await getProfiles(address)
       if (profile && profile.items && profile.items.length > 0) {
         await store.setLoginUserInfo(profile.items[0]);
       }

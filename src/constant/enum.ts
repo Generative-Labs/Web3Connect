@@ -1,5 +1,3 @@
-export const EMAIL_PROVIDER_ID = "web3mq:email:SwapChat";
-export const PHONE_PROVIDER_ID = "web3mq:sms:SwapChat";
 
 export enum PAGE_TYPE {
   PROFILE = "profile",
@@ -15,11 +13,6 @@ export enum PLATFORM_ENUM {
   OPENSEA = "opensea",
 }
 
-export enum CONTACT_SETTING_ENUM {
-  ANYONE = "anyone",
-  FRIENDS = "friends",
-  VERIFIED_USERS = "verified_users",
-}
 
 export enum WEB3_MQ_DID_TYPE {
   PHONE = "phone",

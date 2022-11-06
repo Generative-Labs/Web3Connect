@@ -1,3 +1,4 @@
+import {IMGPROXY_URL, IPFS_GATEWAY} from "./index";
 
 
 export function getUserInfoByJWT() {
@@ -10,12 +11,12 @@ export function getUserInfoByJWT() {
   return null;
 }
 
-export function getShortAddressByAddress(address: string, num: number = 5) {
+export function getShortAddressByAddress(address: string, num: number = 5, endNum = 4) {
   let strLength = address.length;
   return (
     address.substring(0, num) +
     "..." +
-    address.substring(strLength - 4, strLength)
+    address.substring(strLength - endNum, strLength)
   );
 }
 
@@ -47,3 +48,20 @@ export function tokenMgr() {
     },
   };
 }
+
+
+
+export const imageProxy = (url: string, name?: string): string => {
+  return name
+      ? `${IMGPROXY_URL}/tr:n-${name},tr:di-placeholder.webp/${url}`
+      : `${IMGPROXY_URL}/tr:di-placeholder.webp/${url}`;
+};
+
+export const getIPFSLink = (hash: string): string => {
+  const gateway = IPFS_GATEWAY;
+
+  return hash
+      .replace(/^Qm[1-9A-Za-z]{44}/gm, `${gateway}${hash}`)
+      .replace('https://ipfs.io/ipfs/', gateway)
+      .replace('ipfs://', gateway);
+};

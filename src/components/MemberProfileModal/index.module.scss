@@ -364,6 +364,74 @@
 
 
   }
+
+
+  .postBox {
+    width: 100%;
+    padding: 10px;
+
+    .postItemBox {
+      display: flex;
+      margin-top: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+
+      .leftBox{
+        width: 40px;
+        height: 100%;
+        margin-right: 10px;
+        img {
+          width: 100%;
+          height: auto;
+          border-radius: 50%;
+
+        }
+      }
+      .centerBox{
+        width: 100%;
+        .creatorInfoBox {
+          margin-top: -5px;
+          .upName {
+            font-family: 'Helvetica Neue';
+            font-style: normal;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 23px;
+            /* identical to box height, or 164% */
+
+            display: flex;
+            align-items: flex-end;
+
+            color: #000000;
+          }
+          .downName {
+            font-family: 'Helvetica Neue';
+            font-style: normal;
+            font-weight: 500;
+            font-size: 11px;
+            line-height: 19px;
+            display: flex;
+            align-items: center;
+            color: #4C5667;
+          }
+        }
+        .postContent {
+          font-family: 'Helvetica Neue', sans-serif;
+          font-style: normal;
+          font-weight: 400;
+          font-size: 14px;
+          line-height: 23px;
+          color: #424242;
+        }
+      }
+      .rightBox{
+        width: 100px;
+        height: 100%;
+      }
+    }
+
+  }
+
 }
 
 .profile-accounts-header {

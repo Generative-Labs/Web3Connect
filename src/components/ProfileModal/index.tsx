@@ -17,7 +17,7 @@ import userIcon from "../../assert/svg/user.svg";
 import { PAGE_TYPE } from "../../constant/enum";
 import { useHistory } from "react-router-dom";
 import { closeOutline } from "ionicons/icons";
-import {getIPFSLink, imageProxy} from "../../lens/utils";
+import {getIPFSLink, imageProxy} from "../../constant/utils";
 import {COVER} from "../../constant";
 
 const size = 20;

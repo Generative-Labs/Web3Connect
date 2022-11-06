@@ -5,9 +5,8 @@ import "./index.css";
 import useLogin from "../../hooks/useLogin";
 import { useIonLoading, useIonToast } from "@ionic/react";
 import { ethers } from "ethers";
-import { authenticate, challenge, client } from "../../lens/api";
+import {authenticate, challenge, client, getProfiles} from "../../lens/api";
 import { getUserInfoByJWT, TOKEN_KEY, tokenMgr } from "../../constant/utils";
-import { getProfilesRequest } from "../../lens/lens/get-profile";
 import { useStore } from "../../services/mobx/service";
 import { observer } from "mobx-react-lite";
 import { useHistory } from "react-router-dom";
@@ -96,10 +95,7 @@ const Login: React.FC = () => {
       } = authData;
       tokenMgr().setToken(accessToken, TOKEN_KEY.LENS_ACCESS);
       setLensToken(accessToken);
-      const profile = await getProfilesRequest({
-        ownedBy: address,
-      });
-      console.log(profile, "profile");
+      const profile = await getProfiles(address || '');
       if (profile && profile.items && profile.items.length > 0) {
         const lensProfile = profile.items[0];
         await store.setLoginUserInfo(lensProfile);
@@ -128,9 +124,8 @@ const Login: React.FC = () => {
       await init();
       store.setClient(Client.getInstance(keys));
       let address = getUserInfoByJWT().id;
-      const profile = await getProfilesRequest({
-        ownedBy: address,
-      });
+      const profile = await getProfiles(address)
+      console.log('new get profile ')
       if (profile && profile.items && profile.items.length > 0) {
         await store.setLoginUserInfo(profile.items[0]);
       }
@@ -147,11 +142,12 @@ const Login: React.FC = () => {
       await init();
       store.setClient(Client.getInstance(keys));
     }
-
-    const profile = await getProfilesRequest({
-      //@ts-ignore
-      ownedBy: address ? address : window.ethereum.selectedAddress,
-    });
+    //@ts-ignore
+    const profile = await getProfiles(address ? address : window.ethereum.selectedAddress)
+    // const profile = await getProfilesRequest({
+    //   //@ts-ignore
+    //   ownedBy: address ? address : window.ethereum.selectedAddress,
+    // });
     console.log(profile, "profile");
     if (profile && profile.items && profile.items.length > 0) {
       setUserInfo(profile.items[0]);
