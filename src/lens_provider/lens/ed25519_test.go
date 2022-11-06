@@ -1,0 +1,12 @@
+package lens
+
+import (
+	"fmt"
+	"testing"
+)
+
+func TestPrivKeyInit(t *testing.T) {
+	key, err := LoadEd25519PrivateKey("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
+	fmt.Println(key)
+	fmt.Println(err)
+}
